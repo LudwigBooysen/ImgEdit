@@ -1,55 +1,63 @@
-
-// Libs
-ArrayList<TEXTBOX> textboxes = new ArrayList<TEXTBOX>();
-
 // Vars
+PVector currentPos;
+int currentSize;
+
 PVector lastPos;
 int lastSize;
+
+// Holding controls/keys
 boolean holdingCtrl = false;
 
 void setup() {
-  //fullScreen();
   size(600, 600);
   background(51);
   
-  textbox();
+  currentSize = 50;
 }
 
 void draw() {
+  
+  currentPos = new PVector(mouseX, mouseY);
   
   // Mouse down/click
   if (mousePressed) {
     // Draw circle
     fill(255);
     noStroke();
-    ellipse(mouseX, mouseY, 50, 50);
+    ellipse(currentPos.x, currentPos.y, currentSize, currentSize);
     
     // Store last draw
     lastPos = new PVector(mouseX, mouseY);
     lastSize = 50;    
   }
   
-  // Draw textbox/prompt
-  for (TEXTBOX t : textboxes) {
-    t.DRAW();
-  }
-  
 }
 
 void keyPressed() {
-  // Check/Set holding state of CTRL
+  // Check/Set holding states of controls
   if (keyCode == 17) {
     holdingCtrl = true;
   }
   
-  // Ctrl + z = Undo
+  // Controls functions
+  // - Undo
   if (holdingCtrl && keyCode == 90) {
     undo();
   }
+  
+  // - Brush resize
+  // 61 = '=' 45 = '-'
+  if (holdingCtrl && keyCode == 61) {
+    currentSize++;
+  } else if (holdingCtrl && keyCode == 45) {
+    currentSize--;
+  }
+  
+  // println("Key Pressed: " + keyCode + "\n" + "Key: " + key); // Debug: Key logs
 }
 
 void keyReleased() {
-  // Check/Set holding state of CTRL
+  // Check/Set holding states of contorls
   if (keyCode == 17) {
     holdingCtrl = false;
   }
@@ -60,18 +68,6 @@ void undo() {
   fill(51);
   noStroke();
   ellipse(lastPos.x, lastPos.y, lastSize+2, lastSize+2);
-}
-
-// Uses TEXTBOX Lib (might change in future)
-void textbox() {
-  TEXTBOX receiver = new TEXTBOX();
-  receiver.W = 100;
-  receiver.H = 35;
-  receiver.X = (width - 100) / 2;
-  receiver.Y = (height - 35) / 2;
-  
-  textboxes.add(receiver);
-  
 }
 
 // Version (SemVer)
