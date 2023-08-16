@@ -1,75 +1,78 @@
-// Temp Array for all shapes (history)
-PVector[] history = new PVector[1];
-// Draw / brush size
-PVector size = new PVector(50, 50);
+
+// Libs
+ArrayList<TEXTBOX> textboxes = new ArrayList<TEXTBOX>();
+
+// Vars
+PVector lastPos;
+int lastSize;
+boolean holdingCtrl = false;
 
 void setup() {
-  fullScreen();
-  // Set default variables in history array
-  for (int i = 0; i < 1; i++) {
-    history[i] = new PVector(0, 0, 0);
-  }
+  //fullScreen();
+  size(600, 600);
+  background(51);
+  
+  textbox();
 }
 
 void draw() {
-  // Clear background
-  background(51);
-  // Loop through array to know what to draw over the cleared background
-  for (int i = 0; i < history.length; i++) {
-    if (history[i].z > 0) {
-      fill(255);
-      ellipse(history[i].x, history[i].y, history[i].z, history[i].z);
-    }
-  }
-  // Circle draw guider (follows mouse position)
-  noFill();
-  stroke(255);
-  strokeWeight(2);
-  ellipse(mouseX, mouseY, size.x, size.y);
-  // Detect when using brush (drawing)
+  
+  // Mouse down/click
   if (mousePressed) {
-    // Add shape (Custom function)
-    addShape();
+    // Draw circle
+    fill(255);
+    noStroke();
+    ellipse(mouseX, mouseY, 50, 50);
+    
+    // Store last draw
+    lastPos = new PVector(mouseX, mouseY);
+    lastSize = 50;    
   }
+  
+  // Draw textbox/prompt
+  for (TEXTBOX t : textboxes) {
+    t.DRAW();
+  }
+  
 }
-// Detect key pressed events
+
 void keyPressed() {
-  // Declare and set the increase and decrease amount
-  int amount = 1;
-  // Test the already size / amount
-  // Default - MAX = 500 px; MIN = 5 px;
-  if (size.x <= 500 && size.x >= 5) {
-    switch(key) {
-      // Increase size
-      case 'a':
-        size.add(amount, amount);
-        break;
-      // Decrease size
-      case 's':
-        size.sub(amount, amount);
-        break;
-    }
-    // Size assureance
-    if (size.x < 5) {
-      size.set(5, 5);
-    }
-    if (size.x > 500) {
-      size.set(500, 500);
-    }
+  // Check/Set holding state of CTRL
+  if (keyCode == 17) {
+    holdingCtrl = true;
+  }
+  
+  // Ctrl + z = Undo
+  if (holdingCtrl && keyCode == 90) {
+    undo();
   }
 }
-// Custom Functions
-void addShape() {
-  // Temp variables
-  int x = mouseX;
-  int y = mouseY;
-  // Loop throught the draw history
-  for (int i = 0; i < history.length; i++) {
-    if (history[i].z == 0) {
-      history[i] = new PVector(x, y, size.x);
-      history = (PVector[]) expand(history, history.length +1);
-      history[i+1] = new PVector(0, 0, 0);
-      break;
-    }
+
+void keyReleased() {
+  // Check/Set holding state of CTRL
+  if (keyCode == 17) {
+    holdingCtrl = false;
   }
 }
+
+void undo() {
+  // Fill up/clear previous drawn item
+  fill(51);
+  noStroke();
+  ellipse(lastPos.x, lastPos.y, lastSize+2, lastSize+2);
+}
+
+// Uses TEXTBOX Lib (might change in future)
+void textbox() {
+  TEXTBOX receiver = new TEXTBOX();
+  receiver.W = 100;
+  receiver.H = 35;
+  receiver.X = (width - 100) / 2;
+  receiver.Y = (height - 35) / 2;
+  
+  textboxes.add(receiver);
+  
+}
+
+// Version (SemVer)
+// 0.0.0-aplha.1
